@@ -1,71 +1,70 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
-const cron = require("node-cron");
 
+// 📌 Cargar la lista de usuarios desde .env
+const USERS = JSON.parse(process.env.USERS_JSON);
+const COUNTRY_CODE = process.env.COUNTRY_CODE || "es"; // 🇪🇸 País por defecto
 
-
-// Configuración
-const APP_ID = 553850; // Helldivers II
-const COUNTRY_CODE = "es"; // España (ajustar según región)
-const DISCOUNT_THRESHOLD = 10; // % de descuento deseado
-
-// Función para obtener datos del juego
+// 🕵️‍♂️ Función para obtener datos del juego
 async function getGameData(appId, countryCode) {
-  const url = `https://store.steampowered.com/api/appdetails?appids=${appId}&cc=${countryCode}`;
-  try {
-      const response = await fetch(url);
-      const data = await response.json();
-      return data[appId]?.data?.price_overview || null;
-  } catch (error) {
-      console.error("❌ Error al obtener datos de Steam:", error);
-      return null;
-  }
+    const url = `https://store.steampowered.com/api/appdetails?appids=${appId}&cc=${countryCode}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data[appId]?.data?.price_overview || null;
+    } catch (error) {
+        console.error("❌ Error al obtener datos de Steam:", error);
+        return null;
+    }
 }
 
-
-// Configurar Nodemailer
+// 📩 Configurar Nodemailer
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.EMAIL_USER, // Tu correo
-        pass: process.env.EMAIL_PASS, // Contraseña o App Password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
 });
 
-// Función para enviar el email
-async function sendEmail(gameName, price, discount) {
+// 📩 Función para enviar el email
+async function sendEmail(email, gameName, price, discount, appId) {
     const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: process.env.NOTIFY_EMAIL, // Correo al que quieres enviar la alerta
+        to: email,
         subject: `¡${gameName} tiene un ${discount}% de descuento en Steam!`,
-        text: `El precio actual es ${price}. Compra aquí: https://store.steampowered.com/app/${APP_ID}`,
+        text: `El precio actual es ${price}. Compra aquí: https://store.steampowered.com/app/${appId}`,
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("📩 Email enviado con éxito.");
+        console.log(`📩 Email enviado a ${email} sobre ${gameName}`);
     } catch (error) {
-        console.error("❌ Error enviando el email:", error);
+        console.error(`❌ Error enviando email a ${email}:`, error);
     }
 }
 
-// Función principal
-async function checkDiscount() {
-    const gameData = await getGameData(APP_ID, COUNTRY_CODE);
+// 🎯 Función principal para revisar descuentos
+async function checkDiscounts() {
+    for (const user of USERS) {
+        for (const game of user.games) {
+            const gameData = await getGameData(game.appId, COUNTRY_CODE);
 
-    if (!gameData) {
-        console.log("No se pudo obtener el precio del juego.");
-        return;
-    }
+            if (!gameData) {
+                console.log(`⚠️ No se pudo obtener el precio de ${game.name}`);
+                continue;
+            }
 
-    const discount = gameData.discount_percent;
-    if (discount >= DISCOUNT_THRESHOLD) {
-        console.log(`✅ ¡Descuento del ${discount}% detectado! Enviando alerta...`);
-        await sendEmail("Helldivers II", gameData.final_formatted, discount);
-    } else {
-        console.log(`⏳ Aún no hay descuento del ${DISCOUNT_THRESHOLD}% (actual: ${discount}%).`);
+            const discount = gameData.discount_percent;
+            if (discount >= game.minDiscount) {
+                console.log(`✅ ${game.name} tiene un ${discount}% de descuento. Enviando alerta a ${user.email}...`);
+                await sendEmail(user.email, game.name, gameData.final_formatted, discount, game.appId);
+            } else {
+                console.log(`⏳ ${game.name} tiene solo ${discount}% de descuento (se necesita al menos ${game.minDiscount}%).`);
+            }
+        }
     }
 }
 
-// Ejecutar cada 30 minutos
-checkDiscount()
+// 🚀 Ejecutar la función
+checkDiscounts();
