@@ -1,0 +1,25 @@
+name: Ejecutar bot de descuentos
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # Ejecuta cada 30 minutos
+  workflow_dispatch:  # Permite ejecutarlo manualmente
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20  # Usa Node 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar el bot
+        run: node checkDiscount.js
