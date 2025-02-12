@@ -13,6 +13,9 @@ jobs:
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+      USERS_JSON: ${{ secrets.USERS_JSON }}
+      COUNTRY_CODE: ${{ secrets.COUNTRY_CODE }}
+      
       
 
     steps:
