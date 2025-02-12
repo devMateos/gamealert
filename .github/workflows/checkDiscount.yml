@@ -2,12 +2,16 @@ name: Ejecutar bot de descuentos
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # Ejecuta cada 30 minutos
+    - cron: "*/1 * * * *"  # Ejecuta cada 1 minutos
   workflow_dispatch:  # Permite ejecutarlo manualmente
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
+    env:
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
     steps:
       - name: Clonar el repositorio
