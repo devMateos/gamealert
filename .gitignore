@@ -1,0 +1,61 @@
+# Dependencias
+node_modules/
+vendor/
+.env
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE y editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos compilados
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+dist/
+build/
+
+# Logs y bases de datos
+*.log
+*.sql
+*.sqlite
+
+# Archivos de caché
+.cache/
+.npm/
+.eslintcache
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+tmp/
+temp/
+
+# Archivos de configuración local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Directorios de cobertura y pruebas
+coverage/
+.nyc_output/
+
+# Archivos de paquetes
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
