@@ -68,5 +68,4 @@ async function checkDiscount() {
 }
 
 // Ejecutar cada 30 minutos
-cron.schedule(checkDiscount);
-console.log("🚀 Script iniciado. Revisando cada 30 minutos...");
+checkDiscount()
