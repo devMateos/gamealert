@@ -2,7 +2,8 @@ name: Ejecutar bot de descuentos
 
 on:
   schedule:
-    - cron: "0 16 * * *"  # Se ejecutará a las 16:00 UTC todos los días
+    - cron: "30 15 * * *"  # Se ejecutará a las 17:30 hora española (en verano)
+    - cron: "30 16 * * *"  # Se ejecutará a las 17:30 hora española (en invierno)
   workflow_dispatch:  # Permite ejecutarlo manualmente
 
 jobs:
